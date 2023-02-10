@@ -1,0 +1,5 @@
+use master
+create database DB_SistemaContas
+on (filename = 'C:\Willian\Aula 08\BD\BD_SistemaContas.mdf'),
+(filename = 'C:\Willian\Aula 08\BD\BD_SistemaContas.ldf')
+for attach;
