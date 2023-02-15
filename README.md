@@ -12,7 +12,7 @@ Aplicação AspNet MVC + SqlServer
 
 ## Passos para execução:
 * Crie um banco de dados local do SqlServer
-* Execute o arquivo [BD/script TBs.sql](/BD/script TBs.sql)
+* Execute o arquivo [BD/script TBs.sql](https://github.com/Will-Estudo/Sistema-Contas/blob/main/BD/script%20TBs.sql)
 * Modifique a connectionstring na classe SqlServerConfiguration
 
 ## Projeto em execução no HOST:
