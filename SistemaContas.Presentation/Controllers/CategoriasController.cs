@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using SistemaContas.Data.Entities;
 using SistemaContas.Data.Repositories;
 using SistemaContas.Presentation.Models;
+using SistemaContas.Reports.Services;
 
 namespace SistemaContas.Presentation.Controllers
 {
@@ -150,6 +151,40 @@ namespace SistemaContas.Presentation.Controllers
             catch (Exception e)
             {
                 TempData["MensagemErro"] = $"Falha ao excluir categoria: {e.Message}";
+            }
+            return RedirectToAction("Consulta");
+        }
+
+        public IActionResult RelatorioExcel()
+        {
+            try
+            {
+                var categoriaRepository = new CategoriaRepository();
+                var categorias = categoriaRepository.GetByUsario(UsuarioAutenticado.Id);
+
+                var relatorio = new CategoriasReportService().GerarRelatorioExcel(categorias);
+                return File(relatorio, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Relatorio_categorias.xlsx");
+            }
+            catch (Exception e)
+            {
+                TempData["MensagemErro"] = $"Falha ao gerar relatório: {e.Message}";
+            }
+            return RedirectToAction("Consulta");
+        }
+
+        public IActionResult RelatorioPdf()
+        {
+            try
+            {
+                var categoriaRepository = new CategoriaRepository();
+                var categorias = categoriaRepository.GetByUsario(UsuarioAutenticado.Id);
+
+                var relatorio = new CategoriasReportService().GerarRelatorioPdf(categorias);
+                return File(relatorio, "application/pdf", "Relatorio_categorias.pdf");
+            }
+            catch (Exception e)
+            {
+                TempData["MensagemErro"] = $"Falha ao gerar relatório: {e.Message}";
             }
             return RedirectToAction("Consulta");
         }

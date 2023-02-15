@@ -6,6 +6,7 @@ using SistemaContas.Data.Entities;
 using SistemaContas.Data.Enums;
 using SistemaContas.Data.Repositories;
 using SistemaContas.Presentation.Models;
+using SistemaContas.Reports.Services;
 
 namespace SistemaContas.Presentation.Controllers
 {
@@ -164,7 +165,7 @@ namespace SistemaContas.Presentation.Controllers
             return View(model);
         }
 
-            public IActionResult Exclusao(Guid Id)
+        public IActionResult Exclusao(Guid Id)
         {
             try
             {
@@ -216,6 +217,40 @@ namespace SistemaContas.Presentation.Controllers
             return lista;
         }
 
+        public IActionResult RelatorioExcel()
+        {
+            try
+            {
+                var contaRepository = new ContaRepository();
+                var contas = contaRepository.GetByUsario(UsuarioAutenticado.Id);
+
+                var relatorio = new ContasReportService().GerarRelatorioExcel(contas);
+                return File(relatorio, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Relatorio_contas.xlsx");
+            }
+            catch (Exception e)
+            {
+                TempData["MensagemErro"] = $"Falha ao gerar relatório: {e.Message}";
+            }
+            return RedirectToAction("Consulta");
+        }
+
+        public IActionResult RelatorioPdf()
+        {
+            try
+            {
+                var contaRepository = new ContaRepository();
+                var contas = contaRepository.GetByUsario(UsuarioAutenticado.Id);
+
+                var relatorio = new ContasReportService().GerarRelatorioPdf(contas);
+                return File(relatorio, "application/pdf", "Relatorio_contas.pdf");
+            }
+            catch (Exception e)
+            {
+                TempData["MensagemErro"] = $"Falha ao gerar relatório: {e.Message}";
+            }
+            return RedirectToAction("Consulta");
+        }
+
         /// <summary>
         /// Retorna dados do usuário autenticado
         /// </summary>
@@ -244,7 +279,8 @@ namespace SistemaContas.Presentation.Controllers
                         Nome = item.Nome,
                         Data = item.Data.ToString("ddd, dd/MM/yyyy"),
                         Valor = item.Valor.ToString("c"),
-                        Tipo = item.Tipo.ToString()
+                        Tipo = item.Tipo.ToString(),
+                        Categoria = item.Categoria.Nome
                     }
                 );
             }            

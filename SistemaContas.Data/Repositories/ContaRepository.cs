@@ -57,48 +57,74 @@ namespace SistemaContas.Data.Repositories
 
         public List<Conta> GetAll()
         {
-            var query = @"select * from CONTA
-                          order by nome";
+            var query = @"select * from CONTA co
+                          join CATEGORIA ca
+                          on (CA.ID = CO.IDCATEGORIA)
+                          order by CO.nome";
 
             using (var connection = new SqlConnection(SqlServerConfiguration.ConnectionString))
             {
-                return connection.Query<Conta>(query).ToList();
+                return connection.Query(query,
+                    (Conta co, Categoria ca) => { co.Categoria = ca; return co; },
+                    splitOn: "IdCategoria")
+                    .ToList();
             }
         }
 
         public Conta? GetById(Guid id)
         {
-            var query = @"select * from CONTA
-                          where ID = @id";
+            var query = @"select * from CONTA co
+                          join CATEGORIA ca
+                          on (CA.ID = CO.IDCATEGORIA)
+                          where co.ID = @id";
 
             using (var connection = new SqlConnection(SqlServerConfiguration.ConnectionString))
             {
-                return connection.Query<Conta>(query, new { id }).FirstOrDefault();
+                return connection.Query(query,
+                    (Conta co, Categoria ca) => { co.Categoria = ca; return co; },
+                    new { id },
+                    splitOn: "IdCategoria")
+                    .FirstOrDefault();
+                //return connection.Query<Conta>(query, new { id }).FirstOrDefault();
             }
         }
 
         public List<Conta> GetByUsario(Guid idUsuario)
         {
-            var query = @"select * from CONTA
-                          where IDUSUARIO = @idUsuario
-                          order by nome";
+            var query = @"select * from CONTA co
+                          join CATEGORIA ca
+                          on (CA.ID = CO.IDCATEGORIA)
+                          where co.IDUSUARIO = @idUsuario
+                          order by co.nome";
 
             using (var connection = new SqlConnection(SqlServerConfiguration.ConnectionString))
             {
-                return connection.Query<Conta>(query, new { idUsuario }).ToList();
+                //return connection.Query<Conta>(query, new { idUsuario }).ToList();
+                return connection.Query(query,
+                    (Conta co, Categoria ca) => { co.Categoria = ca; return co; },
+                    new { idUsuario },
+                    splitOn: "IdCategoria")
+                    .ToList();
             }
         }
 
         public List<Conta> GetByUsarioAndDatas(Guid idUsuario, DateTime dataIni, DateTime dataFim)
         {
-            var query = @"select * from CONTA
-                          where IDUSUARIO = @idUsuario
-                          and DATA between @dataIni and @dataFim
-                          order by DATA desc";
+            var query = @"select * from CONTA co
+                          join CATEGORIA ca
+                          on (CA.ID = CO.IDCATEGORIA)
+                          where co.IDUSUARIO = @idUsuario
+                          and co.DATA between @dataIni and @dataFim
+                          order by co.DATA desc";
 
             using (var connection = new SqlConnection(SqlServerConfiguration.ConnectionString))
             {
-                return connection.Query<Conta>(query, new { idUsuario, dataIni, dataFim }).ToList();
+                //return connection.Query<Conta>(query, new { idUsuario, dataIni, dataFim }).ToList();
+                return connection.Query(query,
+                    (Conta co, Categoria ca) => { co.Categoria = ca; return co; },
+                    new { idUsuario, dataIni, dataFim },
+                    splitOn: "IdCategoria")
+                    .ToList();
             }
         }
 

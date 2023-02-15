@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Bogus;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SistemaContas.Data.Entities;
 using SistemaContas.Data.Helpers;
 using SistemaContas.Data.Repositories;
+using SistemaContas.Messages.Services;
 using SistemaContas.Presentation.Models;
 using System.Security.Claims;
 
@@ -115,6 +117,41 @@ namespace SistemaContas.Presentation.Controllers
         [HttpPost]
         public IActionResult PasswordRecover(PasswordRecoverViewModel model)
         {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var usuarioRepository = new UsuarioRepository();
+                    var usuario = usuarioRepository.GetByEmail(model.Email);
+
+                    if (usuario != null) 
+                    {
+                        var novaSenha = new Faker().Internet.Password();
+
+                        var emailDest = usuario.Email;
+                        var assunto = "Recuperação de senha - Sistema Contas";
+                        var mensagem = $@"
+                            <h3>Olá, {usuario.Nome}</h3>
+                            <p>Uma nova senha foi gerada para o seu usuário</p>
+                            <p>Acesse o sistema com a senha: {novaSenha}</p>
+                        ";
+
+                        EmailService.EnviarMensagem(emailDest, assunto, mensagem);
+
+                        usuarioRepository.Update(usuario.Id, MD5Helper.Encrypt(novaSenha));
+
+                        TempData["MensagemSucesso"] = "Nova senha enviada para o e-mail cadastrado.";
+                    }
+                    else
+                    {
+                        TempData["MensagemAlerta"] = "Usuário não encontrado, verifique o e-mail informado.";
+                    }
+                }
+                catch (Exception e)
+                {
+                    TempData["MensagemErro"] = $"Falha ao recuperar senha: {e.Message}";
+                }
+            }
             return View();
         }
 

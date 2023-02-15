@@ -12,6 +12,16 @@
             <p>Listagem de categorias cadastradas.</p>
             <hr />
 
+            <div class="mb-2">
+                <a href="/Categorias/RelatorioExcel" class="btn btn-outline-primary">
+                    Gerar Relatório Excel
+                </a>
+
+                <a href="/Categorias/RelatorioPdf" class="btn btn-outline-primary">
+                    Gerar Relatório PDF
+                </a>
+            </div>
+
             <div class="table-responsive">
                 <table id="grid_dados" class="table table-sm table-hover">
                     <thead>
@@ -33,7 +43,7 @@
                                         class="btn btn-sm btn-outline-danger"
                                         onclick="return confirm('Deseja realmente excluir esta categoria?');">
                                         Excluir
-                                    </a>
+                                    </a>                                    
                                 </td>
                             </tr>
                         }

@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Dapper.SqlMapper;
 
 namespace SistemaContas.Data.Repositories
 {
@@ -38,6 +39,19 @@ namespace SistemaContas.Data.Repositories
             using (var connection = new SqlConnection(SqlServerConfiguration.ConnectionString))
             {
                 connection.Execute(query, entity);
+            }
+        }
+
+        public void Update(Guid id, string novaSenha)
+        {
+            var query = @"update USUARIO
+                          set                            
+                            SENHA = @novaSenha
+                          where ID = @Id";
+
+            using (var connection = new SqlConnection(SqlServerConfiguration.ConnectionString))
+            {
+                connection.Execute(query, new { id, novaSenha });
             }
         }
 
